@@ -23,6 +23,6 @@ test('validates invalid price', ()=>{
     expect(()=> new AdRecord({
         ...defaultObj,
         price: -3,
-    })).toThrow('Cena nie może być')
+    })).toThrow('Podana cene jast nie prawidłowa')
 
 })
