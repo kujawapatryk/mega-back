@@ -1,7 +1,9 @@
-import {AdEntity, NewAdEntity} from "../types";
+import {AdEntity, NewAdEntity, SimpleAdEntity} from "../types";
 import {ValidationError} from "../utilits/errors";
 import {pool} from "../utilits/db";
 import {FieldPacket} from "mysql2";
+import {v4 as uuid} from 'uuid';
+
 
 
 
@@ -42,11 +44,27 @@ export class AdRecord implements  NewAdEntity{
         this.url = obj.url;
 
     }
-
     static async getOne(id: string):Promise<AdRecord| null> {
         const [results] =await pool.execute("SELECT * FROM `ads` WHERE id=:id",{id,}) as AdRecordResults;
         return results.length === 0 ? null : new AdRecord(results[0] as NewAdEntity)
 
+    }
+    static async findAll(name: string):Promise<SimpleAdEntity[]> {
+        const [results] =await pool.execute("SELECT * FROM `ads` WHERE name LIKE :search",{search: `%${name}%`,}) as AdRecordResults;
+        return results.map(result=>{
+            const {id,lat,lon} = result;
+            return {id,lat,lon}
+        });
+
+    }
+
+    async insert(): Promise<void> {
+        if(!this.id)
+            this.id=uuid();
+        else
+            throw new Error('NIe mozna dodać ponownie do bazy danych');
+
+        await  pool.execute("INSERT INTO `ads` (`id`,`name`,`description`,`price`, `url`, `lat`, `lon`) VALUES(:id, :name, :description, :price, :url, :lat, :lon)",this)
     }
 
 }

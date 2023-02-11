@@ -1,4 +1,9 @@
 import {AdRecord} from "../records/ad.record";
+import {pool} from "../utilits/db";
+
+afterAll( async () =>{
+await pool.end();
+});
 
 const defaultObj = {
     name:'tenst dname',
@@ -25,4 +30,5 @@ test('validates invalid price', ()=>{
         price: -3,
     })).toThrow('Podana cene jast nie prawidłowa')
 
-})
+});
+
